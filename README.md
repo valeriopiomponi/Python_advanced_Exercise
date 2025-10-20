@@ -11,70 +11,74 @@ Each student will be responsible for one part of the workflow — from reading a
 1. **Create a GitHub repository** for your group project.  
    - The repository name should follow this format:  
      ```
-     data-infra-groupX
-     ```
-     *(replace X with your group number)*  
+     data-infra-name-of-the-group
+     ``` 
 
-2. **Add the given `.tif` image** (provided by the instructor) to the repository root directory.
+2. They push the cloned content to their group repo:
+
+   git remote remove origin
+   git remote add origin https://github.com/...../data-infra-name-of-the-group.git
+   git push -u origin main
 
 3. Each student should:
    - **Clone** the repository.
    - **Create and work on their own branch**, named according to their assigned task:
-     - `task1`
-     - `task2`
-     - `task3`
+     - `metadata_extractor_module`
+     - `json_cleaner_module`
+     - `visualizer_module`
 
 ---
 
 ## 🧠 Tasks
 
-### 🧩 Task 1 — Image to JSON Conversion
+### 🧩 Task 1 — Metadata Extractor Module
 
-**Responsible student:** Branch `task1`
+**Responsible student:** Branch `metadata_extractor_module`
 
-1. Write a **Python class** (e.g., `ImageToJson`) that:
-   - Reads the `.tif` image from disk.
+1. Update semmeta/metadata_extractor_module.py in order to define a **Python class** that:
+   - Reads the `name_of_image.tif` image from imgs folder.
    - Converts the image data and metadata into a **JSON structure**.
-   - Filters out all features whose values are `"null"` or `None`.
 
-2. Save the resulting JSON file in the repository (e.g., `data.json`).
+2. Save the resulting JSON file in the repository (e.g., `output/name_of_image_raw.json`).
 
 **Suggested libraries:** `Pillow`, `numpy`, `json`
 
 ---
 
-### 🧩 Task 2 — Feature Extraction
+### 🧩 Task 2 — Json Cleaner Module
 
-**Responsible student:** Branch `task2`
+**Responsible student:** Branch `json_cleaner_module`
 
-1. Write a **Python class** (e.g., `FeatureExtractor`) that:
-   - Reads the `data.json` file created in Task 1.
-   - Extracts **six specific features** (AP_WD; AP_BEAM_TIME; AP_IMAGE_PIXEL_SIZE; AP_HOLDER_HEIGHT, AP_BEAM_CURRENT, AP_HOLDER_DIAMETER).
-   - Saves the selected features into a new JSON file (e.g., `selected_features.json`).
-
-2. Ensure your code handles missing keys gracefully.
+1. Update the semmeta/json_cleaner_module.py in order to write a **Python class** that:
+  
+   - Reads the `output/name_of_image_raw.json` file created in Task 1.
+   - Filters out all features whose values are `"null"` or `None`.
+   - Saves the new cleaned JSON file as `output/name_of_image_cleaned.json`.
+  
+2. Ensure your code handles missing keys gracefully (`output/name_of_image_cleaned.json` should have a key and a value for each feature.)
 
 **Suggested libraries:** `json`, `pandas`
 
 ---
 
-### 🧩 Task 3 — Visualization and Execution
+### 🧩 Task 3 — Extraction and Visualization
 
-**Responsible student:** Branch `task3`
+**Responsible student:** Branch `visualizer_module`
 
-1. Write a **Python script or class** (e.g., `Visualizer`) that:
+1. Update semmeta/visualizer_module.py  i order to write **Python script or class** that:
+   - From `output/name_of_image_cleaned.json` extract the following features: AP_WD; AP_BEAM_TIME; AP_IMAGE_PIXEL_SIZE; AP_HOLDER_HEIGHT, AP_BEAM_CURRENT, AP_HOLDER_DIAMETER
    - Plots the original `.tif` image.
-   - Displays a table (or printed DataFrame) showing the **keys and values** of the features selected in Task 2.
-
-2. The final program should be **runnable by a user** as follows:
-   - When executed, it should **ask for the name of the `.tif` file** as input (e.g., via `input()` or a command-line argument).
-   - After the user provides the filename, the program should automatically perform:
-     - Image reading  
-     - JSON creation (Task 1)  
-     - Feature extraction (Task 2)  
-     - Visualization (Task 3)
-
+   - Displays a table (or printed DataFrame) showing the **keys and values** of the extracted features:
+  
 **Suggested libraries:** `matplotlib`, `pandas`, `Pillow`
+  
+### 🧩 Task 4 — Execution
+
+Update the main.py file to write a function that allows executing the program by: 
+   - asking for the name of the `name_of_image.tif` file** as input (e.g., via `input()` or a command-line argument).
+   - calling all modules from previous tasks.
+
+
 
 ---
 
@@ -87,17 +91,5 @@ Each student will be responsible for one part of the workflow — from reading a
 
 ---
 
-## ✅ Deliverables
 
-Your final GitHub repository should include:
-- The `.tif` image.
-- The Python scripts for Task 1, Task 2, and Task 3.
-- The generated JSON files (`data.json`, `selected_features.json`).
-- A short `README.md` describing:
-  - The group members.
-  - The purpose of each script.
-  - How to run the pipeline.
 
----
-
-💡 *Tip:* Make sure your code is well-documented and modular — each class should be reusable and callable from the main program in Task 3.
