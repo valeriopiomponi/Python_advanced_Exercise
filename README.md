@@ -53,6 +53,7 @@ Each student will be responsible for one part of the workflow — from reading a
   
    - Reads the `output/name_of_image_raw.json` file created in Task 1.
    - Filters out all features whose values are `"null"` or `None`.
+   - Filters out  `ColorMap` variable
    - Saves the new cleaned JSON file as `output/name_of_image_cleaned.json`.
   
 2. Ensure your code handles missing keys gracefully (`output/name_of_image_cleaned.json` should have a key and a value for each feature.)
