@@ -8,16 +8,19 @@ Each student will be responsible for one part of the workflow — from reading a
 
 ## 🧑‍🤝‍🧑 Group Setup
 
+A Single student for each group should:
+  
+
 1. **Create a GitHub repository** for your group project.  
    - The repository name should follow this format:  
      ```
      data-infra-name-of-the-group
      ``` 
 
-2. They push the cloned content to their group repo:
+2.  Push the cloned content to their group repo:
 
    git remote remove origin
-   git remote add origin https://github.com/...../data-infra-name-of-the-group.git
+   git remote add origin https://github.com/your-username/data-infra-name-of-the-group.git
    git push -u origin main
 
 3. Each student should:

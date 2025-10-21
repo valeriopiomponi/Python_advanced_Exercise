@@ -1,5 +1,0 @@
-# core libs used in your code
-pillow
-matplotlib
-numpy
-pandas
