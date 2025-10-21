@@ -12,7 +12,10 @@ class SEMMetaData:
     def __init__(self, image_metadata={}, semext=('tif','TIF'), semInsTag=[34118]):
         #semext is a tuple corresponding to the valid extension, 34118 is a TIFF tag ofte used by SEM instruments to store extra data
         #define  the following attributes: semext, image_megadata, semInsTag, images_tags (array to store image tag values)
-
+        self.semext = semext
+        self.image_metadata = image_metadata
+        self.semInsTag = semInsTag
+        self.image_tags = np.array([])  # will store numeric tag ids
 
 
     def OpenCheckImage(self, image):
@@ -20,6 +23,16 @@ class SEMMetaData:
         Opens an image file with PILLOW library (Image.open()) and verifies accessibility and format (.tif or .TIF)
         return the opened image object if succesful
         """
+        if not os.path.exists(image):
+            raise FileNotFoundError(f"File not found: {image}")
+
+        ext = os.path.splitext(image)[1].lstrip(".")
+        if ext not in self.semext:
+            raise ValueError(f"Invalid extension '.{ext}'. Expected one of {self.semext}")
+
+        img = Image.open(image)
+        return img
+
 
 
     def ImageMetadata(self, img):
@@ -95,7 +108,35 @@ class SEMMetaData:
             - list: a cleaned and escaped list of instrument metadata strings.
             - and an empty list if tag 34118 is not found.
         '''
+        if not self.semInsTag:
+            return []
 
+        tag_id = self.semInsTag[0]
+        if tag_id not in self.image_metadata:
+            return []
+
+        raw = self.image_metadata[tag_id][:]  # usually a tuple/list/bytes
+        items = []
+
+        def _to_str(x):
+            if isinstance(x, (bytes, bytearray)):
+                return x.decode("utf-8", errors="ignore")
+            return str(x)
+
+        if isinstance(raw, (list, tuple)):
+            raw_parts = [_to_str(x) for x in raw]
+            joined = "\n".join(raw_parts)
+        else:
+            joined = _to_str(raw)
+
+        # split by newlines and semicolons, strip empties
+        for line in joined.replace("\r", "\n").split("\n"):
+            for part in line.split(";"):
+                s = part.strip()
+                if s:
+                    items.append(s)
+
+        return items
 
     def InsMetaDict(self, list):   
 
@@ -106,6 +147,18 @@ class SEMMetaData:
             - and an empty dictionary if parsing fails.  
      
         '''
+        out = {}
+        for i, entry in enumerate(list):
+            entry = entry.strip()
+            if "=" in entry:
+                k, v = entry.split("=", 1)
+                out[k.strip()] = v.strip()
+            elif ":" in entry:
+                k, v = entry.split(":", 1)
+                out[k.strip()] = v.strip()
+            else:
+                out[f"item_{i}"] = entry
+        return out
 
     # Open file in write mode and Export SEM Metadata to JSON Format with json.dump
     def WriteSEMJson(self,file, semdict):
