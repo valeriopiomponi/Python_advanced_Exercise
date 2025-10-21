@@ -6,12 +6,17 @@ import numpy as np
 from PIL import Image, ExifTags #Image processing and metadata
 import json
 
+
 # Class Initialization
 
 class SEMMetaData:
     def __init__(self, image_metadata={}, semext=('tif','TIF'), semInsTag=[34118]):
         #semext is a tuple corresponding to the valid extension, 34118 is a TIFF tag ofte used by SEM instruments to store extra data
         #define  the following attributes: semext, image_megadata, semInsTag, images_tags (array to store image tag values)
+        self.semext = semext
+        self.semInsTag = semInsTag
+        self.image_metadata = image_metadata or {}
+        self.image_tags = np.array([])
 
 
 
@@ -20,6 +25,19 @@ class SEMMetaData:
         Opens an image file with PILLOW library (Image.open()) and verifies accessibility and format (.tif or .TIF)
         return the opened image object if succesful
         """
+        p = str(image)
+        root, ext = os.path.splitext(p)
+        if not ext:                 # no extension? assume .tif
+            p = root + ".tif"
+            ext = ".tif"
+
+        if not os.path.exists(p):
+            raise FileNotFoundError(p)
+
+        if ext[1:] not in self.semext:   # e.g. 'tif' in ('tif','TIF')
+            raise ValueError(f"Expected {self.semext}, got {ext}")
+
+        return Image.open(p)
 
 
     def ImageMetadata(self, img):
@@ -95,6 +113,23 @@ class SEMMetaData:
             - list: a cleaned and escaped list of instrument metadata strings.
             - and an empty list if tag 34118 is not found.
         '''
+        tag_id = self.semInsTag[0]
+        if tag_id not in self.image_metadata:
+            return []
+        raw = self.image_metadata[tag_id][:]
+        if isinstance(raw, (list, tuple)):
+            raw = "\n".join([x.decode("utf-8", "ignore") if isinstance(x, (bytes, bytearray)) else str(x) for x in raw])
+        elif isinstance(raw, (bytes, bytearray)):
+            raw = raw.decode("utf-8", "ignore")
+        else:
+            raw = str(raw)
+        out = []
+        for line in raw.replace("\r", "\n").split("\n"):
+            for part in line.split(";"):
+                s = part.strip()
+                if s:
+                    out.append(s)
+        return out
 
 
     def InsMetaDict(self, list):   
@@ -106,6 +141,41 @@ class SEMMetaData:
             - and an empty dictionary if parsing fails.  
      
         '''
+        out = {}
+        if not list:
+            return out
+
+        for i, entry in enumerate(list):
+            s = str(entry).strip()
+            if not s:
+                continue
+
+            # Find the first separator position (no regex)
+            sep_idx = -1
+            sep_len = 1
+            for ch in ("=", ":", "\t"):
+                idx = s.find(ch)
+                if idx != -1 and (sep_idx == -1 or idx < sep_idx):
+                    sep_idx = idx
+                    sep_len = 1
+
+            # Fallback: two or more spaces
+            if sep_idx == -1:
+                for j in range(len(s) - 1):
+                    if s[j] == " " and s[j + 1] == " ":
+                        sep_idx = j
+                        sep_len = 2
+                        break
+
+            if sep_idx != -1:
+                k = s[:sep_idx].strip()
+                v = s[sep_idx + sep_len :].strip()
+                key = k.upper().replace(" ", "_")
+                out[key] = v
+            else:
+                out[f"ITEM_{i}"] = s
+
+        return out
 
     # Open file in write mode and Export SEM Metadata to JSON Format with json.dump
     def WriteSEMJson(self,file, semdict):
