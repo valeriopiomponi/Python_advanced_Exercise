@@ -33,7 +33,7 @@ class SEMMetaData:
         self.image_tags = np.array(self.image_metadata)
         return self.image_metadata, self.image_tags
 
-
+    @property
     def SEMEXIF(self):
 
         """
@@ -86,7 +86,7 @@ class SEMMetaData:
         allexif_metadict = {**found_metadict, **none_metadict}
         return allexif_metadict
 
-
+    @property
     def GetInsMetadata(self):
 
         '''
