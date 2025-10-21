@@ -36,12 +36,9 @@ Each student will be responsible for one part of the workflow — from reading a
 **Responsible student:** Branch `metadata_extractor_module`
 
 1. Update semmeta/metadata_extractor_module.py in order to define a **Python class** that:
-   - Reads the `name_of_image.tif` image from imgs folder.
-   - Converts the image data and metadata into a **JSON structure**.
+   - Reads the `name_of_image.tif` image from imgs folder, extracts the image metadata and save a json file into the repository (e.g., `output/name_of_image_raw.json`).
+   - The images given are from electron microscopy in a specific format. Since this task is highly specific, the metadata_extractor_module is already partially given, and the student has to fill uncompomplete functions as indicated
 
-2. Save the resulting JSON file in the repository (e.g., `output/name_of_image_raw.json`).
-
-**Suggested libraries:** `Pillow`, `numpy`, `json`
 
 ---
 
@@ -54,8 +51,8 @@ Each student will be responsible for one part of the workflow — from reading a
    - Reads the `output/name_of_image_raw.json` file created in Task 1.
    - Filters out all features whose values are `"null"` or `None`.
    - Saves the new cleaned JSON file as `output/name_of_image_cleaned.json`.
-  
-2. Ensure your code handles missing keys gracefully (`output/name_of_image_cleaned.json` should have a key and a value for each feature.)
+
+2. Test your code with output/image_raw_test.josn and check that the output is a text with keys and values
 
 **Suggested libraries:** `json`, `pandas`
 
@@ -65,18 +62,24 @@ Each student will be responsible for one part of the workflow — from reading a
 
 **Responsible student:** Branch `visualizer_module`
 
-1. Update semmeta/visualizer_module.py  i order to write **Python script or class** that:
+1. Update semmeta/visualizer_module.py  in order to write **Python script or class** that:
    - From `output/name_of_image_cleaned.json` extract the following features: AP_WD; AP_BEAM_TIME; AP_IMAGE_PIXEL_SIZE; AP_HOLDER_HEIGHT, AP_BEAM_CURRENT, AP_HOLDER_DIAMETER
    - Plots the original `.tif` image.
-   - Displays a table (or printed DataFrame) showing the **keys and values** of the extracted features:
+   - Displays a table (or printed DataFrame) showing the **keys and values** of the extracted features in three columns corresponding to: variables, values, units.
+  
+2. Test yout code using output/images_cleaned_test.json
   
 **Suggested libraries:** `matplotlib`, `pandas`, `Pillow`
   
-### 🧩 Task 4 — Execution
+### 🧩 Final Task (Collective) — Execution
 
-Update the main.py file to write a function that allows executing the program by: 
+
+
+1. Write a main.py file to write a function that allows executing the program by: 
    - asking for the name of the `name_of_image.tif` file** as input (e.g., via `input()` or a command-line argument).
    - calling all modules from previous tasks.
+
+2. Merge all the branches in the main branch and test the exuction
 
 
 
